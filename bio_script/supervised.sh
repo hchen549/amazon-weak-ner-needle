@@ -34,8 +34,8 @@ LOSSFUNC=nll
 # param
 MAX_WEIGHT=1
 MAX_LENGTH=256
-BATCH_SIZE=72
-NUM_EPOCHS=5
+BATCH_SIZE=32
+NUM_EPOCHS=3
 LR=5e-5
 WARMUP=0
 SAVE_STEPS=200000
@@ -76,7 +76,9 @@ echo $OUTPUT_DIR
 [ -e $OUTPUT_DIR/script   ] || mkdir -p $OUTPUT_DIR/script
 cp -f $(readlink -f "$0") $OUTPUT_DIR/script
 
-CUDA_VISIBLE_DEVICES=$GPUID python \
+echo "Training..."
+
+CUDA_VISIBLE_DEVICES=$GPUID poetry run python \
     $($DISTRIBUTE_GPU && echo "-m torch.distributed.launch --nproc_per_node=$NUM_GPU --master_port $MASTER_PORT") \
     ${PROJECT_ROOT}/bert-ner/run_ner.py \
     $($USE_DA && echo '--use_da') \
@@ -86,7 +88,7 @@ CUDA_VISIBLE_DEVICES=$GPUID python \
     --model_name_or_path $BERT_MODEL \
     --output_dir $OUTPUT_DIR \
     --logging_dir $OUTPUT_DIR/log \
-    --max_seq_length  $MAX_LENGTH \
+    --max_seq_length $MAX_LENGTH \
     --learning_rate $LR \
     --warmup_steps $WARMUP \
     --num_train_epochs $NUM_EPOCHS \
@@ -98,5 +100,4 @@ CUDA_VISIBLE_DEVICES=$GPUID python \
     --data_dir $DATA_DIR \
     --labels ./labels.txt \
     --logging_steps 100 \
-    --evaluate_during_training \
     --eval_steps $EVAL_STEPS

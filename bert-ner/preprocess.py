@@ -16,6 +16,14 @@ class InputNERExample(object):
         self.labels = labels
         # features is a map of feature column index to array of feature values
         self.features = features
+        
+    def __str__(self):
+        """String representation of the Example."""
+        words_str = ' '.join(self.words)
+        labels_str = ' '.join(self.labels)
+        features_str = ' '.join(self.features)
+
+        return f'GUID: {self.guid}\nWords: {words_str}\nLabels: {labels_str}\nFeatures: {features_str}'
 
 
 class DataProcessor(object):
